@@ -7,17 +7,8 @@ ENV PYTHONUNBUFFERED 1
 
 # Install system dependencies for Django and common Python packages
 RUN apk update && apk add --no-cache \
-    build-base \
-    libffi-dev \
-    postgresql-dev \
-    musl-dev \
-    python3-dev \
-    gcc \
-    cargo \
-    jpeg-dev \
-    zlib-dev \
-    tzdata \
-    bash
+python3-dev \
+tzdata
 # Set working directory
 WORKDIR /app
 
