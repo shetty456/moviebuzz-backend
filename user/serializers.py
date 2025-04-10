@@ -40,7 +40,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         if attrs["password"] != attrs["password2"]:
             raise serializers.ValidationError({"password": "Passwords do not match."})
         try:
-            validate_password(attrs["password"])  # Django’s built-in password checks
+            validate_password(attrs["password"])
         except ValidationError as e:
             raise serializers.ValidationError({"password": list(e.messages)})
         return attrs
