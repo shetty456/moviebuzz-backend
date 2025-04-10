@@ -70,7 +70,7 @@ class CustomUserTests(TestCase):
         CustomUser.objects.create_user(
             email="duplicate@example.com", name="First User", password="password123"
         )
-        with self.assertRaises(Exception):  # IntegrityError or ValidationError
+        with self.assertRaises(Exception): 
             CustomUser.objects.create_user(
                 email="duplicate@example.com",
                 name="Second User",
