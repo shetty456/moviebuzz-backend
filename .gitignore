@@ -40,3 +40,4 @@ static/
 # Windows
 Thumbs.db
 ehthumbs.db
+db.sqlite3
