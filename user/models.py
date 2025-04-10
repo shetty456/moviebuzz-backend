@@ -9,8 +9,8 @@ from django.utils import timezone
 
 # Custom manager to handle user creation logic
 class CustomUserManager(BaseUserManager):
-    def create_user(self, email, name, password=None, role="user"):
-        def create_user(self, email, name, password=None, role="user"):
+    
+     def create_user(self, email, name, password=None, role="user"):
             """
             Creates and returns a user with the given email, name, password, and role.
             """
@@ -22,7 +22,7 @@ class CustomUserManager(BaseUserManager):
             user.save()
             return user
 
-    def create_superuser(self, email, name, password):
+     def create_superuser(self, email, name, password):
         """
         Creates and returns a superuser with admin privileges.
         """
