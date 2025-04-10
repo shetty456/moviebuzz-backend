@@ -70,7 +70,7 @@ class CustomUserTests(TestCase):
         CustomUser.objects.create_user(
             email="duplicate@example.com", name="First User", password="password123"
         )
-        with self.assertRaises(Exception): 
+        with self.assertRaises(Exception):
             CustomUser.objects.create_user(
                 email="duplicate@example.com",
                 name="Second User",
@@ -85,3 +85,24 @@ class CustomUserTests(TestCase):
         )
         self.assertEqual(str(user), "str@example.com")
         print("✅ test_user_str_representation passed")
+
+    def test_login_with_incorrect_password(self):
+        CustomUser.objects.create_user(
+            email="wrongpass@example.com", name="Wrong Pass", password="correctpass"
+        )
+        user = authenticate(email="wrongpass@example.com", password="wrongpass")
+        self.assertIsNone(user)
+
+    print("✅ test_login_with_incorrect_password passed")
+
+    def test_inactive_user_cannot_authenticate(self):
+        user = CustomUser.objects.create_user(
+            email="inactive@example.com", name="Inactive", password="password"
+        )
+        user.is_active = False
+        user.save()
+
+        auth_user = authenticate(email="inactive@example.com", password="password")
+        self.assertIsNone(auth_user)
+
+    print("✅ test_inactive_user_cannot_authenticate passed")
