@@ -1,86 +1,55 @@
-from django.shortcuts import render
-
-# Create your views here.
-from rest_framework.decorators import api_view
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from user.serializers import RegisterSerializer
 from drf_spectacular.utils import extend_schema
+from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 
 
-@csrf_exempt
-@extend_schema(request=RegisterSerializer, responses={201: RegisterSerializer})
-@api_view(["POST"])
-def register_user(request):
+@method_decorator(csrf_exempt, name="dispatch")
+class RegisterUserView(APIView):
     """
-    Register a new user.
+    Register a new user with default role 'user'.
     """
 
-    data = request.data.copy()
-    data["role"] = "user"
-    serializer = RegisterSerializer(data=data, context={"role": "user"})
-    if not serializer.is_valid():
+    role = "user"
+
+    @extend_schema(request=RegisterSerializer, responses={201: RegisterSerializer})
+    def post(self, request):
+        data = request.data.copy()
+        data["role"] = self.role
+        serializer = RegisterSerializer(data=data, context={"role": self.role})
+
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response(
+                {
+                    "message": f"{self.role.capitalize()} registered successfully",
+                    "user": {
+                        "id": user.id,
+                        "name": user.name,
+                        "email": user.email,
+                        "role": user.role,
+                    },
+                },
+                status=status.HTTP_201_CREATED,
+            )
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    user = serializer.save()
 
-    return Response(
-        {
-            "message": "User registered successfully",
-            "user": {
-                "id": user.id,
-                "name": user.name,
-                "email": user.email,
-                "role": user.role,
-            },
-        },
-        status=status.HTTP_201_CREATED,
-    )
+class RegisterManagerView(RegisterUserView):
+    """
+    Register a new manager.
+    """
+
+    role = "manager"
 
 
-@extend_schema(request=RegisterSerializer, responses={201: RegisterSerializer})
-@api_view(["POST"])
-def register_manager(request):
-    data = request.data.copy()
-    data["role"] = "manager"
-    serializer = RegisterSerializer(data=data, context={"role": "manager"})
-    if serializer.is_valid():
-        user = serializer.save()
-        return Response(
-            {
-                "message": "Manager registered",
-                "user": {
-                    "id": user.id,
-                    "name": user.name,
-                    "email": user.email,
-                    "role": user.role,
-                },
-            },
-            status=201,
-        )
-    return Response(serializer.errors, status=400)
+class RegisterAdminView(RegisterUserView):
+    """
+    Register a new admin.
+    """
 
-
-@extend_schema(request=RegisterSerializer, responses={201: RegisterSerializer})
-@api_view(["POST"])
-def register_admin(request):
-    data = request.data.copy()
-    data["role"] = "admin"
-    serializer = RegisterSerializer(data=data, context={"role": "admin"})
-    if serializer.is_valid():
-        user = serializer.save()
-        return Response(
-            {
-                "message": "Admin registered",
-                "user": {
-                    "id": user.id,
-                    "name": user.name,
-                    "email": user.email,
-                    "role": user.role,
-                },
-            },
-            status=201,
-        )
-
-    return Response(serializer.errors, status=400)
+    role = "admin"

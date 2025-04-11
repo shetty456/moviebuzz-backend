@@ -34,7 +34,7 @@ class CustomUserManager(BaseUserManager):
 
 
 # Custom user model extending AbstractBaseUser and PermissionsMixin
-class CustomUser(AbstractBaseUser, PermissionsMixin):
+class UserAccount (AbstractBaseUser, PermissionsMixin):
     # Define user roles
     ROLE_CHOICES = (
         ("admin", "Admin"),

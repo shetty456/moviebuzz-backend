@@ -1,9 +1,9 @@
 from django.contrib import admin
-from user.models import CustomUser
+from user.models import UserAccount
 
 
-@admin.register(CustomUser)
-class CustomUserAdmin(admin.ModelAdmin):
+@admin.register(UserAccount)
+class UserAccountAdmin(admin.ModelAdmin):
     """
     Admin configuration for the CustomUser model.
     """
