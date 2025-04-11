@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from user.models import CustomUser
+from user.models import UserAccount
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         # Define the model associated with this serializer
-        model = CustomUser
+        model = UserAccount
         # Specify the fields to be included in the serialized output
         fields = ["id", "name", "email", "role"]
         read_only_fields = ["id", "role"]
@@ -20,16 +20,16 @@ class RegisterSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(
         write_only=True, required=True, label="Confirm Password"
     )
-
+    role = serializers.CharField(read_only=True)
     class Meta:
-        model = CustomUser
-        fields = ["id", "name", "email", "password", "password2"]
-        read_only_fields = ["id"]
+        model =  UserAccount
+        fields = ["id", "name", "email", "password", "password2","role"]
+        read_only_fields = ["id", "role"]
 
-        def validate_email(self, value):
+    def validate_email(self, value):
             # Check for duplicate email (case-insensitive)
             value = value.lower()
-            if CustomUser.objects.filter(email=value).exists():
+            if UserAccount.objects.filter(email=value).exists():
                 raise serializers.ValidationError(
                     "A user with this email already exists."
                 )
@@ -49,7 +49,8 @@ class RegisterSerializer(serializers.ModelSerializer):
         # Remove password2, hash password, and create user
         validated_data.pop("password2")
         password = validated_data.pop("password")
-        user = CustomUser(**validated_data)
+        role = self.context.get("role", "user")
+        user = UserAccount(**validated_data,role=role)
         user.set_password(password)
         user.save()
         return user

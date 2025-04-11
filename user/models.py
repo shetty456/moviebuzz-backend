@@ -34,7 +34,7 @@ class CustomUserManager(BaseUserManager):
 
 
 # Custom user model extending AbstractBaseUser and PermissionsMixin
-class CustomUser(AbstractBaseUser, PermissionsMixin):
+class UserAccount (AbstractBaseUser, PermissionsMixin):
     # Define user roles
     ROLE_CHOICES = (
         ("admin", "Admin"),
@@ -53,7 +53,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
     # Configuration for authentication
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["name", "password"]
+    REQUIRED_FIELDS = ["name"]
 
     def __str__(self):
         """String representation of the user object."""
