@@ -1,12 +1,12 @@
 from django.test import TestCase
-from user.models import CustomUser
+from user.models import UserAccount
 from django.contrib.auth import authenticate
 
 
-class CustomUserTests(TestCase):
+class AccountUserTests(TestCase):
     # Test the creation of a standard user
     def test_create_user(self):
-        user = CustomUser.objects.create_user(
+        user = UserAccount.objects.create_user(
             email="testuser@example.com", name="Test User", password="securepassword123"
         )
         self.assertIsNotNone(user)
@@ -20,7 +20,7 @@ class CustomUserTests(TestCase):
 
     def test_create_superuser(self):
         # Test the creation of a superuser (admin)
-        admin = CustomUser.objects.create_superuser(
+        admin = UserAccount.objects.create_superuser(
             email="admin@example.com", name="Admin User", password="adminpass"
         )
         self.assertIsNotNone(admin)
@@ -33,14 +33,14 @@ class CustomUserTests(TestCase):
     def test_create_user_without_email(self):
         # Attempting to create a user without an email should raise a ValueError
         with self.assertRaises(ValueError):
-            CustomUser.objects.create_user(
+            UserAccount.objects.create_user(
                 email="", name="No Email", password="nopassword"
             )
         print("✅ test_create_user_without_email passed")
 
     def test_default_role_is_user(self):
         # Ensure that users are assigned the default role "user" upon creation
-        user = CustomUser.objects.create_user(
+        user = UserAccount.objects.create_user(
             email="rolecheck@example.com", name="Role Check", password="password"
         )
         self.assertEqual(user.role, "user")
@@ -48,7 +48,7 @@ class CustomUserTests(TestCase):
 
     def test_login_with_correct_credentials(self):
         # Simulate a login using Django's authenticate method with correct credentials
-        CustomUser.objects.create_user(
+        UserAccount.objects.create_user(
             email="login@example.com", name="Login User", password="correctpassword"
         )
 
@@ -59,7 +59,7 @@ class CustomUserTests(TestCase):
 
     def test_login_simulation_by_password_check(self):
         # Directly check password verification using check_password
-        user = CustomUser.objects.create_user(
+        user = UserAccount.objects.create_user(
             email="manual@example.com", name="Manual Login", password="mypassword"
         )
         self.assertTrue(user.check_password("mypassword"))
@@ -67,11 +67,11 @@ class CustomUserTests(TestCase):
 
     def test_duplicate_email_registration_fails(self):
         # Email field should be unique; creating two users with same email must fail
-        CustomUser.objects.create_user(
+        UserAccount.objects.create_user(
             email="duplicate@example.com", name="First User", password="password123"
         )
         with self.assertRaises(Exception):
-            CustomUser.objects.create_user(
+            UserAccount.objects.create_user(
                 email="duplicate@example.com",
                 name="Second User",
                 password="password456",
@@ -80,14 +80,14 @@ class CustomUserTests(TestCase):
 
     def test_user_str_representation(self):
         # Test the __str__ method of the user mode
-        user = CustomUser.objects.create_user(
+        user = UserAccount.objects.create_user(
             email="str@example.com", name="Stringy", password="pass"
         )
         self.assertEqual(str(user), "str@example.com")
         print("✅ test_user_str_representation passed")
 
     def test_login_with_incorrect_password(self):
-        CustomUser.objects.create_user(
+        UserAccount.objects.create_user(
             email="wrongpass@example.com", name="Wrong Pass", password="correctpass"
         )
         user = authenticate(email="wrongpass@example.com", password="wrongpass")
@@ -96,7 +96,7 @@ class CustomUserTests(TestCase):
     print("✅ test_login_with_incorrect_password passed")
 
     def test_inactive_user_cannot_authenticate(self):
-        user = CustomUser.objects.create_user(
+        user = UserAccount.objects.create_user(
             email="inactive@example.com", name="Inactive", password="password"
         )
         user.is_active = False
@@ -106,3 +106,16 @@ class CustomUserTests(TestCase):
         self.assertIsNone(auth_user)
 
     print("✅ test_inactive_user_cannot_authenticate passed")
+
+
+    def test_create_manager(self):
+    # Test the creation of a superuser (admin)
+      manager = UserAccount.objects.create_superuser(
+        email="manager@example.com", name="manager User", password="managerpass"
+     )
+      self.assertIsNotNone(manager)
+      self.assertEqual(manager.email, "manager@example.com")
+      self.assertEqual(manager.role, "manager")
+      self.assertTrue(manager.is_staff)
+      self.assertTrue(manager.is_superuser)
+    print("✅ test_create_manage_user passed")
