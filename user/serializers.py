@@ -3,8 +3,13 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.contrib.auth import authenticate,get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
-
+from .models import Profile
 UserAccount = get_user_model()
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ["bio", "location", "birth_date"]
 # Serializer for the CustomUser model to expose specific fields in API responses.
 class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
@@ -76,3 +81,10 @@ class LoginSerializer(serializers.Serializer):
         data["refresh_token"] = str(refresh)
 
         return data
+class UserWithProfileSerializer(serializers.ModelSerializer):
+    profile = ProfileSerializer()
+
+    class Meta:
+        model = UserAccount
+        fields = ["id", "name", "email", "role", "profile"]
+        read_only_fields = ["id", "role", "email"]

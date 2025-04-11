@@ -1,5 +1,7 @@
 from django.test import TestCase
 from django.contrib.auth import authenticate, get_user_model
+from django.test import Client
+from user.models import Profile
 
 
 class AccountUserTests(TestCase):
@@ -134,3 +136,42 @@ class AccountUserTests(TestCase):
         self.assertTrue(manager.is_staff)
         self.assertTrue(manager.is_superuser)
         print("✅ test_create_manager passed")
+
+
+class LogoutTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.User = get_user_model()
+        self.user = self.User.objects.create_user(
+            email="logoutuser@example.com", name="Logout User", password="logoutpass"
+        )
+
+    def test_logout(self):
+
+        login = self.client.login(email="logoutuser@example.com", password="logoutpass")
+        self.assertTrue(login)
+
+        response = self.client.logout()
+
+        self.assertNotIn("_auth_user_id", self.client.session)
+        print("✅ test_logout passed")
+
+
+class AccountUserTests(TestCase):
+    # Test the creation and access of a user profile
+    def test_user_profile_creation(self):
+        User = get_user_model()
+        user = User.objects.create_user(
+            email="profileuser@example.com", name="Profile User", password="profilepass"
+        )
+
+        profile = Profile.objects.create(
+            user=user, bio="Hello world!", location="Earth"
+        )
+
+        self.assertIsNotNone(profile)
+        self.assertEqual(profile.user, user)
+        self.assertEqual(profile.bio, "Hello world!")
+        self.assertEqual(profile.location, "Earth")
+        self.assertEqual(str(profile), "Profile of profileuser@example.com")
+        print("✅ test_user_profile_creation passed")

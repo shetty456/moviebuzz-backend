@@ -1,11 +1,13 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
-from user.serializers import RegisterSerializer,LoginSerializer
+from rest_framework import status, generics,permissions
+from user.serializers import RegisterSerializer, LoginSerializer, ProfileSerializer
 from drf_spectacular.utils import extend_schema
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from user.models import UserAccount
+from user.models import UserAccount,Profile
+from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -55,6 +57,7 @@ class RegisterAdminView(RegisterUserView):
 
     role = "admin"
 
+
 class LoginView(APIView):
     """
     Authenticate user and return access and refresh tokens.
@@ -78,3 +81,47 @@ class LoginView(APIView):
                 status=status.HTTP_200_OK,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LogoutView(APIView):
+    """
+    Blacklist the refresh token to log the user out securely.
+    """
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    @extend_schema(
+        request=None,
+        responses={204: None},
+        description="Logout user by blacklisting the refresh token.",
+    )
+    def post(self, request):
+        try:
+            refresh_token = request.data["refresh_token"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+
+            return Response(
+                {"message": "Logout successful."}, status=status.HTTP_205_RESET_CONTENT
+            )
+        except KeyError:
+            return Response(
+                {"error": "Refresh token is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except TokenError:
+            return Response(
+                {"error": "Invalid or expired token."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+class UserProfileView(generics.RetrieveUpdateAPIView):
+    serializer_class = ProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    @extend_schema(
+        responses={200: ProfileSerializer},
+        request=ProfileSerializer,
+        description="Get or update your profile information.",
+    )
+    def get_object(self):
+        return Profile.objects.get(user=self.request.user)
