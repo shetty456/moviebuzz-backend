@@ -3,7 +3,7 @@ from user.models import UserAccount
 from django.contrib.auth import authenticate
 
 
-class CustomUserTests(TestCase):
+class AccountUserTests(TestCase):
     # Test the creation of a standard user
     def test_create_user(self):
         user = UserAccount.objects.create_user(
@@ -106,3 +106,16 @@ class CustomUserTests(TestCase):
         self.assertIsNone(auth_user)
 
     print("✅ test_inactive_user_cannot_authenticate passed")
+
+
+    def test_create_manager(self):
+    # Test the creation of a superuser (admin)
+      manager = UserAccount.objects.create_superuser(
+        email="manager@example.com", name="manager User", password="managerpass"
+     )
+      self.assertIsNotNone(manager)
+      self.assertEqual(manager.email, "manager@example.com")
+      self.assertEqual(manager.role, "manager")
+      self.assertTrue(manager.is_staff)
+      self.assertTrue(manager.is_superuser)
+    print("✅ test_create_manage_user passed")
