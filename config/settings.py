@@ -13,9 +13,10 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 from os import getenv
+from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+load_dotenv(dotenv_path=BASE_DIR / '.env.local')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -39,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'user'
+    'user',
     'drf_spectacular'
 ]
 
@@ -134,12 +135,12 @@ AUTH_USER_MODEL = 'user.CustomUser'
 # DRF & JWT Configuration
 
 REST_FRAMEWORK = {
-    "DEFAULT_SCHEMA_CLASS":"drf_spectacular.apenapi.AutoSchema",
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_RENDERER_CLASSES": [
-        "rest_framework.renderers.JSONRender",
+        "rest_framework.renderers.JSONRenderer", 
     ],
     "DEFAULT_PARSER_CLASSES": [
-        "rest_framework.parser.JSONparser",
+        "rest_framework.parsers.JSONParser",  
     ],
 }
 
