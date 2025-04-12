@@ -5,7 +5,7 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 from django.utils import timezone
-from django.conf import settings
+
 
 # Custom manager to handle user creation logic
 class CustomUserManager(BaseUserManager):

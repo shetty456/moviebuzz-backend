@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status, generics, permissions
-from user.serializers import RegisterSerializer, LoginSerializer, ProfileSerializer
+from rest_framework import status
+from user.serializers import RegisterSerializer
 from drf_spectacular.utils import extend_schema
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
