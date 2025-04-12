@@ -9,7 +9,7 @@ class Auditorium(models.Model):
     movie = models.ForeignKey(Movie, on_delete=models.SET_NULL, null=True, blank=True)
     total_shows=models.CharField(max_length=100)
     place = models.CharField(max_length=255)
-
+    admin = models.ForeignKey(UserAccount, on_delete=models.SET_NULL, null=True, blank=True, related_name='auditoriums')
     def __str__(self):
         return f"{self.name} - {self.place}"
     @property
