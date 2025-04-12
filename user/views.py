@@ -5,6 +5,7 @@ from user.serializers import RegisterSerializer
 from drf_spectacular.utils import extend_schema
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from user.permissions import IsAdminorReadonly,IsUser
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -53,3 +54,18 @@ class RegisterAdminView(RegisterUserView):
     """
 
     role = "admin"
+
+class Updateview(APIView):
+    permission_classes = [IsAdminorReadonly]
+
+    def get(request):
+        return {"msg:u are admin"}
+    
+class GetUserview(APIView):
+    permission_classes = [IsUser]
+
+    def get(request):
+        return {"msg:u are User"}    
+
+        
+
