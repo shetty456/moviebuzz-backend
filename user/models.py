@@ -5,7 +5,7 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 from django.utils import timezone
-
+from django.conf import settings
 
 # Custom manager to handle user creation logic
 class CustomUserManager(BaseUserManager):
@@ -71,3 +71,11 @@ class UserAccount (AbstractBaseUser, PermissionsMixin):
     def Is_Manager_role(self):
          return self.role == 'Manager'
     
+class Profile(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    bio = models.TextField(blank=True)
+    location = models.CharField(max_length=255, blank=True)
+    birth_date = models.DateField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Profile of {self.user.email}"
