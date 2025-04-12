@@ -7,6 +7,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from user.models import UserAccount, Profile
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+from user.permissions import IsAdminorReadonly,IsUser
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -126,3 +127,17 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
     )
     def get_object(self):
         return Profile.objects.get(user=self.request.user)
+class Updateview(APIView):
+    permission_classes = [IsAdminorReadonly]
+
+    def get(request):
+        return {"msg:u are admin"}
+    
+class GetUserview(APIView):
+    permission_classes = [IsUser]
+
+    def get(request):
+        return {"msg:u are User"}    
+
+        
+

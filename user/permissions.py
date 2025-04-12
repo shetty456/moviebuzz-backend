@@ -1,10 +1,16 @@
-from rest_framework.permissions import SAFE_METHODS,BasePermission
-from user.models import CustomUser
+from rest_framework.permissions import SAFE_METHODS,BasePermission,IsAuthenticated
+from django.contrib.auth import get_user_model
+
+
+
+User = get_user_model()
 
 class IsAdminorReadonly(BasePermission):
 
-    def AdminPermissions(self , view , request):
-        get_data = CustomUser.get()
-        if request.user.role == 'Admin':
-            return SAFE_METHODS
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and request.user.Is_Admin_role
+    
+class IsUser(BasePermission):
 
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and request.user.Is_User_role    
