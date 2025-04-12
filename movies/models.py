@@ -17,7 +17,7 @@ class Genre(models.Model):
 
 
 # Create your models here.
-class Movies(models.Model):
+class Movie(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
     language_id = models.ForeignKey(Language, on_delete=models.SET_NULL, null=True)
@@ -25,13 +25,13 @@ class Movies(models.Model):
     user_id = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
     rate = models.DecimalField(max_digits=3, decimal_places=1)
     price = models.DecimalField(max_digits=6, decimal_places=2)
-
+    image_url = models.URLField(max_length=500, blank=True, null=True) 
     def __str__(self):
         return self.title
 
 
 class MovieGenre(models.Model):
-    movie = models.ForeignKey(Movies, on_delete=models.CASCADE)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
 
     class Meta:
