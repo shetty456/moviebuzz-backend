@@ -31,7 +31,7 @@ class Movie(models.Model):
 
 
 class MovieGenre(models.Model):
-    movie = models.ForeignKey(Movies, on_delete=models.CASCADE)
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     genre = models.ForeignKey(Genre, on_delete=models.CASCADE)
 
     class Meta:
