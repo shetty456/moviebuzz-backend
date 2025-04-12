@@ -25,7 +25,7 @@ class Movie(models.Model):
     user_id = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
     rate = models.DecimalField(max_digits=3, decimal_places=1)
     price = models.DecimalField(max_digits=6, decimal_places=2)
-
+    image_url = models.URLField(max_length=500, blank=True, null=True) 
     def __str__(self):
         return self.title
 
