@@ -3,12 +3,14 @@ from django.contrib.auth import authenticate, get_user_model
 from django.test import Client
 from user.models import Profile
 
+User = get_user_model()
+
 
 class AccountUserTests(TestCase):
 
     # Test the creation of a standard user
     def test_create_user(self):
-        User = get_user_model()
+
         user = User.objects.create_user(
             email="testuser@example.com", name="Test User", password="securepassword123"
         )
@@ -23,7 +25,7 @@ class AccountUserTests(TestCase):
 
     # Test the creation of a superuser (admin)
     def test_create_superuser(self):
-        User = get_user_model()
+
         admin = User.objects.create_superuser(
             email="admin@example.com", name="Admin User", password="adminpass"
         )
@@ -36,14 +38,14 @@ class AccountUserTests(TestCase):
 
     # Test creating a user without an email should raise an error
     def test_create_user_without_email(self):
-        User = get_user_model()
+
         with self.assertRaises(ValueError):
             User.objects.create_user(email="", name="No Email", password="nopassword")
         print("✅ test_create_user_without_email passed")
 
     # Test that the default role for a user is "user"
     def test_default_role_is_user(self):
-        User = get_user_model()
+
         user = User.objects.create_user(
             email="rolecheck@example.com", name="Role Check", password="password"
         )
@@ -52,7 +54,7 @@ class AccountUserTests(TestCase):
 
     # Test login with correct credentials
     def test_login_with_correct_credentials(self):
-        User = get_user_model()
+
         User.objects.create_user(
             email="login@example.com", name="Login User", password="correctpassword"
         )
@@ -64,7 +66,7 @@ class AccountUserTests(TestCase):
 
     # Test login by manually checking password
     def test_login_simulation_by_password_check(self):
-        User = get_user_model()
+
         user = User.objects.create_user(
             email="manual@example.com", name="Manual Login", password="mypassword"
         )
@@ -73,7 +75,7 @@ class AccountUserTests(TestCase):
 
     # Test that creating two users with the same email will raise an error
     def test_duplicate_email_registration_fails(self):
-        User = get_user_model()
+
         User.objects.create_user(
             email="duplicate@example.com", name="First User", password="password123"
         )
@@ -87,7 +89,7 @@ class AccountUserTests(TestCase):
 
     # Test the __str__ method of the user model
     def test_user_str_representation(self):
-        User = get_user_model()
+
         user = User.objects.create_user(
             email="str@example.com", name="Stringy", password="pass"
         )
@@ -96,7 +98,7 @@ class AccountUserTests(TestCase):
 
     # Test login with incorrect password should fail
     def test_login_with_incorrect_password(self):
-        User = get_user_model()
+
         User.objects.create_user(
             email="wrongpass@example.com", name="Wrong Pass", password="correctpass"
         )
@@ -106,7 +108,7 @@ class AccountUserTests(TestCase):
 
     # Test that inactive users cannot authenticate
     def test_inactive_user_cannot_authenticate(self):
-        User = get_user_model()
+
         user = User.objects.create_user(
             email="inactive@example.com", name="Inactive", password="password"
         )
@@ -119,7 +121,7 @@ class AccountUserTests(TestCase):
 
     # Test the creation of a manager user
     def test_create_manager(self):
-        User = get_user_model()
+
         # Create a manager user
         manager = User.objects.create_user(
             email="manager@example.com", name="Manager User", password="managerpass"
@@ -157,10 +159,10 @@ class LogoutTests(TestCase):
         print("✅ test_logout passed")
 
 
-class AccountUserTests(TestCase):
+class ProfileTests(TestCase):
     # Test the creation and access of a user profile
     def test_user_profile_creation(self):
-        User = get_user_model()
+
         user = User.objects.create_user(
             email="profileuser@example.com", name="Profile User", password="profilepass"
         )

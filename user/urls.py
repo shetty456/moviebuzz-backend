@@ -13,6 +13,6 @@ urlpatterns = [
     path("register/admin/", RegisterAdminView.as_view(), name="register_admin"),
     path("login/", LoginView.as_view(), name="login"),
     path("logout/", LogoutView.as_view(), name="logout"),
-    path("profile/",UserProfileView.as_view, naME="profile")
+    path("profile/",UserProfileView.as_view, name="profile")
 
 ]

@@ -1,13 +1,12 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status, generics,permissions
+from rest_framework import status, generics, permissions
 from user.serializers import RegisterSerializer, LoginSerializer, ProfileSerializer
 from drf_spectacular.utils import extend_schema
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from user.models import UserAccount,Profile
+from user.models import UserAccount, Profile
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
-
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -114,6 +113,8 @@ class LogoutView(APIView):
                 {"error": "Invalid or expired token."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+
 class UserProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = ProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
