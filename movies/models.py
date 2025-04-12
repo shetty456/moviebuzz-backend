@@ -17,7 +17,7 @@ class Genre(models.Model):
 
 
 # Create your models here.
-class Movies(models.Model):
+class Movie(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
     language_id = models.ForeignKey(Language, on_delete=models.SET_NULL, null=True)
