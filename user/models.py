@@ -61,15 +61,15 @@ class UserAccount (AbstractBaseUser, PermissionsMixin):
     
     @property
     def Is_Admin_role(self):
-         return self.role == 'Admin'
+         return self.role == 'admin'
     
     @property
     def Is_User_role(self):
-         return self.role == 'User'
+         return self.role == 'user'
     
     @property
     def Is_Manager_role(self):
-         return self.role == 'Manager'
+         return self.role == 'manager'
     
 class Profile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -92,11 +92,3 @@ class Profile(models.Model):
     def Is_Manager_role(self):
          return self.role == 'Manager'
     
-class Profile(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    bio = models.TextField(blank=True)
-    location = models.CharField(max_length=255, blank=True)
-    birth_date = models.DateField(null=True, blank=True)
-
-    def __str__(self):
-        return f"Profile of {self.user.email}"
