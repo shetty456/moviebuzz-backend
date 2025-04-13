@@ -153,7 +153,10 @@ def reserve_seat(request):
 
     # Create the booking
     booking = BookingHistory.objects.create(
-        user=request.user, seat=seat, showtime=seat.showtime,tickets=tickets,
+        user=request.user,
+        seat=seat,
+        showtime=seat.showtime,
+        tickets=tickets,
     )
 
     return Response(
