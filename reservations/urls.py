@@ -1,18 +1,34 @@
 from django.urls import path
 from reservations.views import (
-    view_of_user_reservation,
-    view_all_reservation,
-    reserve_seat,
-    user_reservation_details,
-    cancel_future_reservation,
+    ViewUserReservations,
+    ViewAllReservations,
+    ReserveSeat,
+    UserReservationDetails,
+    CancelFutureMovieReservation,
 )
 
 app_name = "reservations"
 
 urlpatterns = [
-    path("reservations/admin/", view_all_reservation, name="view_all_reservations"),
-    path("reservations/user/", view_of_user_reservation, name="view_user_reservations"),
-    path("reservations/cancel/", cancel_future_reservation, name="cancel_reservation"),
-    path("reservations/details/", user_reservation_details, name="reservation_details"),
-    path("reservations/book/", reserve_seat, name="reserve_seat"),
+    path(
+        "reservations/admin/",
+        ViewAllReservations.as_view(),
+        name="view_all_reservations",
+    ),
+    path(
+        "reservations/user/",
+        ViewUserReservations.as_view(),
+        name="view_user_reservations",
+    ),
+    path(
+        "reservations/cancel/",
+        CancelFutureMovieReservation.as_view(),
+        name="cancel_reservation",
+    ),
+    path(
+        "reservations/details/",
+        UserReservationDetails.as_view(),
+        name="reservation_details",
+    ),
+    path("reservations/book/", ReserveSeat.as_view(), name="reserve_seat"),
 ]
