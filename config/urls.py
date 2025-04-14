@@ -25,6 +25,7 @@ urlpatterns = [
     path("api/user/", include(("user.urls", "user"), namespace="user")),
     
     
+    
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
         "api/docs/",
