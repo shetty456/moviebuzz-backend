@@ -58,6 +58,19 @@ class UserAccount (AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         """String representation of the user object."""
         return self.email
+    
+    @property
+    def Is_Admin_role(self):
+         return self.role == 'admin'
+    
+    @property
+    def Is_User_role(self):
+         return self.role == 'user'
+    
+    @property
+    def Is_Manager_role(self):
+         return self.role == 'manager'
+    
 class Profile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     bio = models.TextField(blank=True)
@@ -66,3 +79,16 @@ class Profile(models.Model):
 
     def __str__(self):
         return f"Profile of {self.user.email}"
+    
+    @property
+    def Is_Admin_role(self):
+         return self.role == 'Admin'
+    
+    @property
+    def Is_User_role(self):
+         return self.role == 'User'
+    
+    @property
+    def Is_Manager_role(self):
+         return self.role == 'Manager'
+    

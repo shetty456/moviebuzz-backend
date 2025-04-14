@@ -2,11 +2,15 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, generics, permissions
 from user.serializers import RegisterSerializer, LoginSerializer, ProfileSerializer
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema,OpenApiParameter
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from user.models import UserAccount, Profile
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+from user.permissions import IsAdminorReadonly, IsUser
+from reservations.models import Showtime
+from reservations.serializers import ShowtimeSerializer
+import datetime
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -126,3 +130,31 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
     )
     def get_object(self):
         return Profile.objects.get(user=self.request.user)
+
+class ListMoviesonPerticularDate(APIView):
+    serializer_class = ShowtimeSerializer
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                'date', 
+                type=str, 
+                # format='date',  # Specifies that it's a date type
+                description='The date in YYYY-MM-DD format', 
+                required=True
+            ),
+        ],
+        responses={200: ShowtimeSerializer},
+    )
+
+    def get(self, request, *args, **kwargs):
+        
+        date = request.query_params.get('date')
+
+        if date:
+            date_obj = datetime.datetime.strptime(date, '%Y-%m-%d').date()
+            shows = Showtime.objects.filter(start_time__date=date_obj)
+            serializer = self.serializer_class(shows,many=True)
+            return Response(serializer.data)
+        
+        else:
+            return Response({"Error: Facing issues to fetch data try later"})

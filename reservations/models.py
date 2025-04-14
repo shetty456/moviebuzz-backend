@@ -1,7 +1,11 @@
 from django.db import models
 from user.models import UserAccount
 from movies.models import Movie
+from django.contrib.auth import get_user_model
 from django.utils import timezone
+
+User = get_user_model()
+
 
 
 class Auditorium(models.Model):
@@ -43,7 +47,11 @@ class Showtime(models.Model):
     start_time = models.DateTimeField()
 
     def __str__(self):
-        return f"{self.movie.title} at {self.start_time.strftime('%Y-%m-%d %H:%M')} in {self.auditorium.name}"
+        return f"{self.movie_id.title} at {self.start_time.strftime('%Y-%m-%d %H:%M')} in {self.auditorium_id.name}"
+
+    @property
+    def get_date_of_show(self):
+        return self.start_time.strftime("%Y-%m-%d")
 
     @property
     def available_seats(self):
@@ -94,6 +102,7 @@ class Review(models.Model):
 
     class Meta:
         ordering = ["-reviewed_at"]
+
 
 
 class BookingHistory(models.Model):
