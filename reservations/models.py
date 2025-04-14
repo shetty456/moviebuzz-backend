@@ -1,6 +1,9 @@
 from django.db import models
 from user.models import UserAccount
 from movies.models import Movie
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class Auditorium(models.Model):
@@ -48,7 +51,7 @@ class Seat(models.Model):
 
 
 class Review(models.Model):
-    user_id = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     movie_id = models.ForeignKey(Movie, on_delete=models.CASCADE)
     rating = models.PositiveIntegerField()
     comment = models.TextField(blank=True)

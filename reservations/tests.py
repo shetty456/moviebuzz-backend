@@ -8,10 +8,13 @@ from datetime import datetime, timedelta
 from movies.models import Movie
 from reservations.models import Auditorium, Showtime
 from user.models import UserAccount
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class ListMoviesOnParticularDateTest(TestCase):
     def setUp(self):
-        self.user = UserAccount.objects.create_user(email='test@example.com', name='Test User', password='password')
+        self.user = User.objects.create_user(email='test@example.com', name='Test User', password='password')
         self.movie = Movie.objects.create(
             title="Test Movie",
             description="Test description",
