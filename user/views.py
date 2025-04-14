@@ -9,7 +9,7 @@ from user.models import UserAccount, Profile
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from user.permissions import IsAdminorReadonly, IsUser
 from reservations.models import Showtime
-from reservations.serilizers import ShowtimeSerializer
+from reservations.serializers import ShowtimeSerializer
 import datetime
 
 
