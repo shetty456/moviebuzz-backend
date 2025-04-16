@@ -1,17 +1,23 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
-
-
-
+from rest_framework import status, generics, viewsets
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework.permissions import IsAuthenticated
 
 from django.utils import timezone
-
-from reservations.models import BookingHistory, Seat
-from reservations.serializers import BookingHistorySerializer, SeatSerializer
+from reservations.models import BookingHistory, Seat, Showtime, Auditorium
+from movies.models import Movie
+from movies.serilizers import MovieSerializer
+from reservations.serializers import (
+    BookingHistorySerializer,
+    SeatSerializer,
+    ShowtimeSerializer,
+    ShowtimeDetailerializer,
+)
 from user.permissions import IsAdminOrReadOnly
+import datetime
+from user.permissions import IsAdminOrReadOnly, IsUser
 
 
 class ViewAllReservations(APIView):
@@ -159,3 +165,77 @@ class ReserveSeat(APIView):
             {"message": "Seat reserved successfully.", "booking_id": booking.id},
             status=status.HTTP_201_CREATED,
         )
+
+
+class GetavilableSeats(generics.GenericAPIView):
+
+    serializer_class = SeatSerializer
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "movie_name",
+                # OpenApiParameter.IN_QUERY,
+                description="The name of the movie",
+                type=str,
+                required=True,
+            ),
+            OpenApiParameter(
+                "auditorium_name",
+                # OpenApiParameter.IN_QUERY,
+                description="The name of the auditorium",
+                type=str,
+                required=True,
+            ),
+            OpenApiParameter(
+                "show_time",
+                # OpenApiParameter.IN_QUERY,
+                description="The show time for the movie",
+                type=str,
+                required=True,
+            ),
+        ]
+    )
+    def get(self, request):
+        movie_name = request.GET.get("movie_name")
+        auditorium_name = request.GET.get("auditorium_name")
+        show = request.GET.get("show_time")
+
+        moviedata = Movie.objects.get(title=movie_name)
+        auditoriumdata = Auditorium.objects.get(name=auditorium_name)
+
+        if not all([movie_name, auditorium_name, show]):
+            return Response({"Error:parameters required"})
+
+        else:
+            try:
+
+                show_time = datetime.datetime.strptime(show, "%H:%M:%S").time()
+
+                show = Showtime.objects.filter(
+                    movie=moviedata,
+                    auditorium=auditoriumdata,
+                    start_time__time=show_time,
+                ).first()
+            except Showtime.DoesNotExist:
+                return Response({"Error:show not found"}, status=404)
+        seats = Seat.objects.filter(showtime=show)
+        serializer = SeatSerializer(seats, many=True)
+        return Response(serializer.data)
+
+
+class MovieViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAdminOrReadOnly]
+    queryset = Movie.objects.all()
+    serializer_class = MovieSerializer
+
+
+class ShowtimeViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAdminOrReadOnly]
+    queryset = Showtime.objects.all()
+
+    def get_serializer_class(self):
+        # Check the action (GET for list or retrieve, otherwise use the other serializer)
+        if self.action in ["list", "retrieve"]:  # For GET requests (list or detail)
+            return ShowtimeDetailerializer
+        return ShowtimeSerializer

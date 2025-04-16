@@ -25,11 +25,6 @@ class Auditorium(models.Model):
     def __str__(self):
         return f"{self.name} - {self.place}"
 
-    @property
-    def upcoming_showtimes(self):
-        return self.showtime_set.filter(start_time__gte=timezone.now()).order_by(
-            "start_time"
-        )
 
 
 class Showtime(models.Model):
@@ -47,19 +42,19 @@ class Showtime(models.Model):
     start_time = models.DateTimeField()
 
     def __str__(self):
-        return f"{self.movie_id.title} at {self.start_time.strftime('%Y-%m-%d %H:%M')} in {self.auditorium_id.name}"
+        return f"{self.movie.title} at {self.start_time.strftime('%Y-%m-%d %H:%M')} in {self.auditorium.name}"
 
     @property
     def get_date_of_show(self):
         return self.start_time.strftime("%Y-%m-%d")
 
-    @property
-    def available_seats(self):
-        return self.seat_set.filter(is_booked=False)
 
     @property
-    def total_booked(self):
-        return self.seat_set.filter(is_booked=True).count()
+    def upcoming_showtimes(self):
+        return self.showtime_set.filter(start_time__gte=timezone.now()).order_by(
+            "start_time"
+        )  
+        
 
     def cancel_show(self):
         self.status = "cancelled"
