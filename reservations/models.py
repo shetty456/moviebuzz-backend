@@ -1,7 +1,10 @@
 from django.db import models
-from user.models import UserAccount
+
 from movies.models import Movie
 from django.utils import timezone
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class Auditorium(models.Model):
@@ -11,7 +14,7 @@ class Auditorium(models.Model):
     total_shows = models.PositiveIntegerField()
     place = models.CharField(max_length=255)
     admin = models.ForeignKey(
-        UserAccount,
+        User,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -83,7 +86,7 @@ class Seat(models.Model):
 
 
 class Review(models.Model):
-    user = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     rating = models.PositiveIntegerField()
     comment = models.TextField(blank=True)
@@ -97,12 +100,13 @@ class Review(models.Model):
 
 
 class BookingHistory(models.Model):
-    user = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)
     showtime = models.ForeignKey(Showtime, on_delete=models.CASCADE)
     tickets = models.PositiveIntegerField()
     booked_at = models.DateTimeField(auto_now_add=True)
     seat = models.ForeignKey(Seat, null=True, blank=True, on_delete=models.SET_NULL)
+
     def __str__(self):
         return (
             f"{self.user.username} booked {self.tickets} ticket(s) for {self.showtime}"
