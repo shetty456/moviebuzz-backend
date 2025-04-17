@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils.timezone import make_aware
 from datetime import datetime, timedelta
-
+from rest_framework.test import APITestCase
 from movies.models import Movie
 from reservations.models import Auditorium, Showtime
 
@@ -13,12 +13,13 @@ from django.contrib.auth import get_user_model
 
 from rest_framework.test import APIClient
 from rest_framework import status
-
-from movies.models import Movie, Language
+from movies.serilizers import MovieSerializer
+from reservations.serializers import ShowtimeSerializer, SeatSerializer
+from movies.models import Movie, Language, MovieGenre, Genre
 from reservations.models import BookingHistory, Showtime, Auditorium, Seat
 
-from django.utils import timezone
 
+from django.utils import timezone
 
 
 User = get_user_model()
@@ -52,7 +53,7 @@ class ListMoviesOnParticularDateTest(TestCase):
             start_time=make_aware(datetime(2025, 4, 16, 4, 6, 40)),
         )
 
-    def test_get_showtimes_by_date(self):
+def test_get_showtimes_by_date(self):
         url = reverse("user:showsbydate")  # use your actual url name here
         response = self.client.get(url, {"date": "2025-04-16"})
 
@@ -172,3 +173,5 @@ class ReservationAPITestCase(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["seat"]["seat_number"], self.seat.seat_number)
+
+

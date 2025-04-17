@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from movies.models import Movie
 from reservations.models import Auditorium, Seat, Showtime, Review, BookingHistory
 from movies.serilizers import MovieSerializer
 
@@ -7,12 +8,22 @@ from movies.serilizers import MovieSerializer
 class SeatSerializer(serializers.ModelSerializer):
     class Meta:
         model = Seat
-        fields = ("seat_number", "is_booked",'showtime')
+        fields = ("seat_number", "is_booked", "showtime")
 
 
 # Showtime Serializer
-class ShowtimeSerializer(serializers.ModelSerializer):
+class ShowtimeDetailerializer(serializers.ModelSerializer):
     movie = MovieSerializer()
+
+    class Meta:
+        model = Showtime
+        fields = ("movie", "auditorium", "status", "start_time")
+
+
+class ShowtimeSerializer(serializers.ModelSerializer):
+    movie = serializers.PrimaryKeyRelatedField(
+        queryset=Movie.objects.all()
+    )  # Only the movie ID (primary key)
 
     class Meta:
         model = Showtime
@@ -52,3 +63,9 @@ class BookingHistorySerializer(serializers.ModelSerializer):
         model = BookingHistory
         fields = "__all__"
         depth = 1
+
+
+class SeatQuerySerializer(serializers.Serializer):
+    movie_name = serializers.CharField()
+    auditorium_name = serializers.CharField()
+    show_time = serializers.CharField()
