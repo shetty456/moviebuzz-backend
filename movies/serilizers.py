@@ -19,8 +19,6 @@ class MovieSerializer(serializers.ModelSerializer):
 
 
 # MovieGenre Serializer
-
-
 class MovieGenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = MovieGenre

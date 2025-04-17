@@ -8,7 +8,7 @@ User = get_user_model()
 class IsAdminorReadonly(BasePermission):
 
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.Is_Admin_role
+        return request.user.is_authenticated and request.user.role == "user"
     
 class IsUser(BasePermission):
 
@@ -22,4 +22,4 @@ class IsAdminOrReadOnly(BasePermission):
         if request.method in SAFE_METHODS:
             return True
 
-        return request.user.is_authenticated and request.user.role == "Admin"
+        return request.user.is_authenticated and request.user.role == "admin"

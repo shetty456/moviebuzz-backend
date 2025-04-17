@@ -18,6 +18,8 @@ from reservations.serializers import (
 from user.permissions import IsAdminOrReadOnly
 import datetime
 from user.permissions import IsAdminOrReadOnly, IsUser
+from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiResponse
+from drf_spectacular.types import OpenApiTypes
 
 
 class ViewAllReservations(APIView):
@@ -30,7 +32,7 @@ class ViewAllReservations(APIView):
 
 
 class ViewUserReservations(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsUser]
 
     def get(self, request):
         reservation = BookingHistory.objects.filter(user=request.user)
@@ -39,10 +41,44 @@ class ViewUserReservations(APIView):
 
 
 class CancelFutureMovieReservation(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsUser]
 
+    @extend_schema(
+        request=OpenApiTypes.OBJECT,
+        examples=[OpenApiExample("Cancel Booking", value={"booking_id": "1"})],
+        responses={
+            200: OpenApiResponse(
+                description="Success",
+                examples=[
+                    OpenApiExample(
+                        "OK", value={"message": "Reservation cancelled successfully."}
+                    )
+                ],
+            ),
+            400: OpenApiResponse(
+                description="Bad Request",
+                examples=[
+                    OpenApiExample(
+                        "Missing", value={"error": "Booking ID is required."}
+                    )
+                ],
+            ),
+            404: OpenApiResponse(
+                description="Not Found",
+                examples=[
+                    OpenApiExample(
+                        "Not Found", value={"error": "Reservation not found."}
+                    )
+                ],
+            ),
+        },
+    )
     def post(self, request):
         booking_id = request.data.get("booking_id")
+        if not booking_id:
+            return Response(
+                {"error": "Booking ID is required."}, status=status.HTTP_400_BAD_REQUEST
+            )
 
         try:
             reservation = BookingHistory.objects.get(id=booking_id, user=request.user)
@@ -53,7 +89,7 @@ class CancelFutureMovieReservation(APIView):
 
         if reservation.showtime.start_time <= timezone.now():
             return Response(
-                {"error": "Cannot cancel past or ongoing showtime reservations."},
+                {"error": "Cannot cancel past or ongoing reservations."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -65,11 +101,55 @@ class CancelFutureMovieReservation(APIView):
 
 
 class UserReservationDetails(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsUser]
 
+    @extend_schema(
+        request=OpenApiTypes.OBJECT,
+        examples=[OpenApiExample("Seat Info", value={"seat_id": "5"})],
+        responses={
+            200: OpenApiResponse(
+                description="Details Found",
+                examples=[
+                    OpenApiExample(
+                        "Info",
+                        value={
+                            "message": "Seat details retrieved successfully.",
+                            "seat": {"id": 5, "number": "A3", "status": "booked"},
+                            "showtime": "2025-04-25T18:00:00Z",
+                            "movie": "Inception",
+                        },
+                    )
+                ],
+            ),
+            400: OpenApiResponse(
+                description="Missing",
+                examples=[
+                    OpenApiExample(
+                        "Missing Seat ID", value={"error": "Seat ID is required."}
+                    )
+                ],
+            ),
+            404: OpenApiResponse(
+                description="Not Found",
+                examples=[
+                    OpenApiExample("Seat Missing", value={"error": "Seat not found."})
+                ],
+            ),
+            403: OpenApiResponse(
+                description="Forbidden",
+                examples=[
+                    OpenApiExample(
+                        "Invalid",
+                        value={
+                            "error": "This seat does not belong to any of your bookings."
+                        },
+                    )
+                ],
+            ),
+        },
+    )
     def post(self, request):
         seat_id = request.data.get("seat_id")
-
         if not seat_id:
             return Response(
                 {"error": "Seat ID is required."}, status=status.HTTP_400_BAD_REQUEST
@@ -87,7 +167,6 @@ class UserReservationDetails(APIView):
         booking = BookingHistory.objects.filter(
             user=request.user, showtime=seat.showtime
         ).first()
-
         if not booking:
             return Response(
                 {"error": "This seat does not belong to any of your bookings."},
@@ -96,12 +175,11 @@ class UserReservationDetails(APIView):
 
         if seat.showtime.start_time <= timezone.now():
             return Response(
-                {"error": "Cannot access past or ongoing showtime reservations."},
+                {"error": "Cannot access past or ongoing reservations."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         seat_data = SeatSerializer(seat).data
-
         return Response(
             {
                 "message": "Seat details retrieved successfully.",
@@ -114,12 +192,69 @@ class UserReservationDetails(APIView):
 
 
 class ReserveSeat(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsUser]
 
+    @extend_schema(
+        request=OpenApiTypes.OBJECT,
+        examples=[
+            OpenApiExample(
+                "Reserve", value={"seat_id": "10", "showtime_id": "2", "tickets": 1}
+            )
+        ],
+        responses={
+            201: OpenApiResponse(
+                description="Created",
+                examples=[
+                    OpenApiExample(
+                        "Booked",
+                        value={
+                            "message": "Seat reserved successfully.",
+                            "booking_id": 101,
+                        },
+                    )
+                ],
+            ),
+            400: OpenApiResponse(
+                description="Bad Request",
+                examples=[
+                    OpenApiExample(
+                        "Missing",
+                        value={"error": "Seat ID and Showtime ID are required."},
+                    )
+                ],
+            ),
+            403: OpenApiResponse(
+                description="Forbidden",
+                examples=[
+                    OpenApiExample(
+                        "Admin Block",
+                        value={"error": "Admin users are not allowed to book tickets."},
+                    )
+                ],
+            ),
+            404: OpenApiResponse(
+                description="Not Found",
+                examples=[
+                    OpenApiExample(
+                        "Missing", value={"error": "Seat or Showtime not found."}
+                    )
+                ],
+            ),
+            409: OpenApiResponse(
+                description="Conflict",
+                examples=[
+                    OpenApiExample(
+                        "Already Booked", value={"error": "Seat is already booked."}
+                    )
+                ],
+            ),
+        },
+    )
     def post(self, request):
         seat_id = request.data.get("seat_id")
         showtime_id = request.data.get("showtime_id")
         tickets = request.data.get("tickets", 1)
+
         if request.user.role == "admin":
             return Response(
                 {"error": "Admin users are not allowed to book tickets."},
@@ -144,8 +279,7 @@ class ReserveSeat(APIView):
 
         if BookingHistory.objects.filter(seat=seat).exists():
             return Response(
-                {"error": "Seat is already booked."},
-                status=status.HTTP_409_CONFLICT,
+                {"error": "Seat is already booked."}, status=status.HTTP_409_CONFLICT
             )
 
         if seat.showtime.start_time <= timezone.now():
@@ -235,7 +369,7 @@ class ShowtimeViewSet(viewsets.ModelViewSet):
     queryset = Showtime.objects.all()
 
     def get_serializer_class(self):
-        # Check the action (GET for list or retrieve, otherwise use the other serializer)
-        if self.action in ["list", "retrieve"]:  # For GET requests (list or detail)
+
+        if self.action in ["list", "retrieve"]:
             return ShowtimeDetailerializer
         return ShowtimeSerializer

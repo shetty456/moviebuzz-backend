@@ -21,9 +21,7 @@ class ShowtimeDetailerializer(serializers.ModelSerializer):
 
 
 class ShowtimeSerializer(serializers.ModelSerializer):
-    movie = serializers.PrimaryKeyRelatedField(
-        queryset=Movie.objects.all()
-    )  # Only the movie ID (primary key)
+    movie = serializers.PrimaryKeyRelatedField(queryset=Movie.objects.all())
 
     class Meta:
         model = Showtime
