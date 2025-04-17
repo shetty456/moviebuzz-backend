@@ -3,12 +3,8 @@ from django.db import models
 from movies.models import Movie
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from django.contrib.auth import get_user_model
 
 User = get_user_model()
-
-User = get_user_model()
-
 
 
 class Auditorium(models.Model):
@@ -27,7 +23,6 @@ class Auditorium(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.place}"
-
 
 
 class Showtime(models.Model):
@@ -51,13 +46,11 @@ class Showtime(models.Model):
     def get_date_of_show(self):
         return self.start_time.strftime("%Y-%m-%d")
 
-
     @property
     def upcoming_showtimes(self):
         return self.showtime_set.filter(start_time__gte=timezone.now()).order_by(
             "start_time"
-        )  
-        
+        )
 
     def cancel_show(self):
         self.status = "cancelled"
@@ -100,7 +93,6 @@ class Review(models.Model):
 
     class Meta:
         ordering = ["-reviewed_at"]
-
 
 
 class BookingHistory(models.Model):

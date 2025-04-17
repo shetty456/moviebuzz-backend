@@ -4,21 +4,21 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils.timezone import make_aware
 from datetime import datetime, timedelta
-from rest_framework.test import APITestCase
-from movies.models import Movie
-from reservations.models import Auditorium, Showtime
+
+from movies.models import Movie, Language
+
+from reservations.models import (
+    Auditorium,
+    Showtime,
+    BookingHistory,
+    Showtime,
+    Auditorium,
+    Seat,
+)
 
 from django.contrib.auth import get_user_model
-
-
 from rest_framework.test import APIClient
 from rest_framework import status
-from movies.serilizers import MovieSerializer
-from reservations.serializers import ShowtimeSerializer, SeatSerializer
-from movies.models import Movie, Language, MovieGenre, Genre
-from reservations.models import BookingHistory, Showtime, Auditorium, Seat
-
-
 from django.utils import timezone
 
 
@@ -53,13 +53,14 @@ class ListMoviesOnParticularDateTest(TestCase):
             start_time=make_aware(datetime(2025, 4, 16, 4, 6, 40)),
         )
 
-def test_get_showtimes_by_date(self):
-        url = reverse("user:showsbydate")  # use your actual url name here
-        response = self.client.get(url, {"date": "2025-04-16"})
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]["movie_id"], self.movie.id)
+def test_get_showtimes_by_date(self):
+    url = reverse("user:showsbydate") 
+    response = self.client.get(url, {"date": "2025-04-16"})
+
+    self.assertEqual(response.status_code, 200)
+    self.assertEqual(len(response.data), 1)
+    self.assertEqual(response.data[0]["movie_id"], self.movie.id)
 
 
 class ReservationAPITestCase(TestCase):
@@ -173,5 +174,3 @@ class ReservationAPITestCase(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["seat"]["seat_number"], self.seat.seat_number)
-
-

@@ -235,7 +235,7 @@ class ShowtimeViewSet(viewsets.ModelViewSet):
     queryset = Showtime.objects.all()
 
     def get_serializer_class(self):
-        # Check the action (GET for list or retrieve, otherwise use the other serializer)
-        if self.action in ["list", "retrieve"]:  # For GET requests (list or detail)
+       
+        if self.action in ["list", "retrieve"]:  
             return ShowtimeDetailerializer
         return ShowtimeSerializer
